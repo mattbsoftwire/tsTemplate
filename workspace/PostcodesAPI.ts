@@ -13,9 +13,15 @@ export class PostcodesAPI {
             .then(JSON.parse)
             .then(rawdata => {
                 return {
-                    longitude: Number(rawdata.longitude),
-                    latitude: Number(rawdata.latitude)
+                    longitude: Number(rawdata.result.longitude),
+                    latitude: Number(rawdata.result.latitude)
                 } as Location
             })
+            .then(location => {
+                if (Number.isNaN(location.longitude) || Number.isNaN(location.latitude)) {
+                    throw new Error("Invalid coordinates from Postcode API.");
+                }
+                return location;
+            });
     }
 }
