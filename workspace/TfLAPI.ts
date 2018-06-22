@@ -22,7 +22,6 @@ export class TfLAPI {
     private static BUS_STOP_TYPE = "NaptanPublicBusCoachTram";
 
     public getNextArrivalsAtStop(stopID: string): Promise<Arrival[]> {
-        console.error(stopID);
         return request(`${TfLAPI.API_URL}/StopPoint/${stopID}/Arrivals${TfLAPI.CREDENTIALS}`)
             .then(JSON.parse)
             .then(list => list.map(arrival => {
