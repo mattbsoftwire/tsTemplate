@@ -12,8 +12,7 @@ export class ExpressAPI{
         return this.postcodesAPI.getLongLatFromPostcode(postcode)
             .then(location => this.getClosestTwoStops(location))
             .then(list => Promise.all(
-                list.slice(0, 2)
-                    .map(stop => this.tflAPI.getNextArrivalsAtStop(stop.naptanId))
+                list.map(stop => this.tflAPI.getNextArrivalsAtStop(stop.naptanId))
                 )
             )
             .then(ExpressAPI.takeFirstFiveForEach);
@@ -25,7 +24,7 @@ export class ExpressAPI{
                 if (stopList.length < 2) {
                     return this.getClosestTwoStops(location, radius + ExpressAPI.RADIUS_INCREASE_STEP);
                 } else {
-                    return stopList;
+                    return stopList.slice(0, 2);
                 }
             });
 

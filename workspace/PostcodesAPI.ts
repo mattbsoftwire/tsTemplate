@@ -11,11 +11,11 @@ export class PostcodesAPI {
     public getLongLatFromPostcode(postcode: string): Promise<Location> {
         return request(`${PostcodesAPI.API_URL}/postcodes/${postcode}`)
             .then(JSON.parse)
-            .then(rawdata => {
+            .then<Location>(rawdata => {
                 return {
                     longitude: Number(rawdata.result.longitude),
                     latitude: Number(rawdata.result.latitude)
-                } as Location
+                }
             })
             .then(location => {
                 if (Number.isNaN(location.longitude) || Number.isNaN(location.latitude)) {
