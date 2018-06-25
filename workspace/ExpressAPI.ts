@@ -3,8 +3,8 @@ import {Arrival, Stop, TfLAPI} from "./TfLAPI";
 import {Location, PostcodesAPI} from "./PostcodesAPI";
 
 export class ExpressAPI{
-    private tflAPI = new TfLAPI();
-    private postcodesAPI = new PostcodesAPI();
+    private tflAPI: TfLAPI = new TfLAPI();
+    private postcodesAPI: PostcodesAPI = new PostcodesAPI();
     private static takeFirstFiveForEach = stopArrivals => stopArrivals.map(arrivals => arrivals.slice(0, 5));
     private static RADIUS_INCREASE_STEP : number = 100;
 
@@ -29,6 +29,12 @@ export class ExpressAPI{
 
     }
 
+    private createErrorMessage(message: string): string {
+        return JSON.stringify({
+            "error": message
+        });
+    }
+
     public hostAPI() {
         const app = express();
 
@@ -36,18 +42,21 @@ export class ExpressAPI{
         app.get('/', (req,res) => res.sendFile(__dirname + '/index.html'));
 
         app.get('/closestStops', (req, res) => {
-            //TODO sanitise req
-            this.postcodesAPI.isValidLondonPostcode(req.query.postcode)
+            if (!req.hasOwnProperty("query")) {
+                res.send(this.createErrorMessage("invalid request"));
+            }
+
+            const postcode = req.query.postcode;
+
+            this.postcodesAPI.isValidLondonPostcode(postcode)
                 .then(valid => {
                     if (!valid) {
                         throw new Error("Postcode not in London");
                     }
-                    this.getNextFiveArrivalsForPostCode(req.query.postcode)
-                        .then(response => res.send(JSON.stringify(response)));
                 })
-                .catch(reason => res.send(JSON.stringify({
-                    "error": reason.message
-                })));
+                .then(() => this.getNextFiveArrivalsForPostCode(postcode))
+                .then(response => res.send(JSON.stringify(response)))
+                .catch(error => res.send(this.createErrorMessage(error.message)));
         });
         app.listen(3000, () => console.log('Example app listening on port 3000!'))
     }
