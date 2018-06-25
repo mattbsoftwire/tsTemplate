@@ -8,29 +8,6 @@ export interface Location{
 export class PostcodesAPI {
     private static API_URL = "http://api.postcodes.io";
 
-    public isValidPostcode(postcode: string): Promise<boolean> {
-        //API doesn't handle empty string
-        if(postcode === '') {
-            return Promise.resolve(false);
-        }
-
-        return request(`${PostcodesAPI.API_URL}/postcodes/${postcode}/validate`)
-            .then(JSON.parse)
-            .then(response => response.result);
-    }
-
-    public isValidLondonPostcode(postcode: string): Promise<boolean> {
-        return this.isValidPostcode(postcode)
-            .then(valid => {
-                if (!valid) {
-                    throw new Error("Invalid Postcode");
-                }
-            })
-            .then(() => request(`${PostcodesAPI.API_URL}/postcodes/${postcode}`))
-            .then(JSON.parse)
-            .then(response => response.result.region == "London");
-    }
-
     public getLongLatFromPostcode(postcode: string): Promise<Location> {
         return request(`${PostcodesAPI.API_URL}/postcodes/${postcode}`)
             .then(JSON.parse)
@@ -47,4 +24,32 @@ export class PostcodesAPI {
                 return location;
             });
     }
+
+    public isValidPostcode(postcode: string): Promise<boolean> {
+        //API doesn't handle empty string
+        if(postcode === '') {
+            return Promise.resolve(false);
+        }
+
+        return request(`${PostcodesAPI.API_URL}/postcodes/${postcode}/validate`)
+            .then(JSON.parse)
+            .then(response => response.result);
+    }
+
+    public isValidLondonPostcode(postcode: string): Promise<boolean> {
+        return this.isValidPostcode(postcode)
+            .then(valid => {
+                if (valid) {
+                    return PostcodesAPI.isLondonPostcode(postcode)
+                }
+                throw new Error("Invalid Postcode");
+            });
+    }
+
+    private static isLondonPostcode(postcode: string) {
+        return request(`${PostcodesAPI.API_URL}/postcodes/${postcode}`)
+            .then(JSON.parse)
+            .then(response => response.result.region == "London")
+    }
+
 }

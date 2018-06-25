@@ -1,13 +1,17 @@
 const ENTER_KEYCODE = 13;
+let postcode = ""
+window.onload = updatePostcode;
 
-window.onload = getStopData;
+function updatePostcode(){
+    postcode = document.getElementById("postcodeInput").value;
+    getStopData();
+}
 
 function postcodeKeypress(event) {
-    if(event.keyCode == ENTER_KEYCODE) getStopData();
+    if(event.keyCode == ENTER_KEYCODE) updatePostcode();
 }
 
 function getStopData() {
-    const postcode = document.getElementById("postcodeInput").value;
     const xhttp = new XMLHttpRequest();
     xhttp.open("GET", "http://localhost:3000/closestStops?postcode="+postcode, false);
     xhttp.setRequestHeader("Content-type", "application/json");
