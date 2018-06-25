@@ -13,8 +13,7 @@ export class ExpressAPI{
             .then(location => this.getClosestTwoStops(location))
             .then(list => Promise.all(
                 list.map(stop => this.tflAPI.getNextArrivalsAtStop(stop.naptanId))
-                )
-            )
+            ))
             .then(ExpressAPI.takeFirstFiveForEach);
     }
 

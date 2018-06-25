@@ -1,9 +1,9 @@
 import { Template } from './workspace/template'
+import {ExpressAPI} from "./workspace/ExpressAPI";
 
 export class Index {
     public static main(): number {
-        const template = new Template();
-        template.run();
+        new ExpressAPI().hostAPI();
 
         return 0;
     }
