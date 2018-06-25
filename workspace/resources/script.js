@@ -12,6 +12,7 @@ function getStopData() {
     xhttp.open("GET", "http://localhost:3000/closestStops?postcode="+postcode, false);
     xhttp.setRequestHeader("Content-type", "application/json");
     xhttp.send();
+
     const response = JSON.parse(xhttp.responseText);
     const stopList = document.getElementById('stopList');
 
@@ -20,7 +21,7 @@ function getStopData() {
         stopList.innerHTML =
             `<div class="stopContainer">
                <div class="stopTitle">
-                 Error: ${response.error}
+                 ERROR: ${response.error.toUpperCase()}
                </div>
              </div>`;
         return;
