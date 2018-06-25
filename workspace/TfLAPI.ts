@@ -55,7 +55,6 @@ export class TfLAPI {
                     stop.distance = Number(stop.distance);
                     return stop;
                 })
-                .sort((a: Stop, b: Stop) => b.distance - a.distance)
             );
     }
 }
