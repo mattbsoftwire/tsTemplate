@@ -32,7 +32,10 @@ export class ExpressAPI{
     public hostAPI() {
         const app = express()
 
-        app.get('/closeststops', (req, res) => {
+        app.use(express.static(__dirname + '/resources'));
+        app.get('/', (req,res) => res.sendFile(__dirname + '/index.html'));
+
+        app.get('/closestStops', (req, res) => {
             const postcode = req.query.postcode;
 
             this.getNextFiveArrivalsForPostCode(postcode)

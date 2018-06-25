@@ -1,4 +1,3 @@
-import { Template } from './workspace/template'
 import {ExpressAPI} from "./workspace/ExpressAPI";
 
 export class Index {

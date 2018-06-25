@@ -1,0 +1,95 @@
+.titleBar{
+    background-color: #C27375;
+    margin: 0px;
+    padding: 50px;
+    color: #5A0002;
+    border-radius: 30px;
+    font-size: 48px;
+    display: flex;
+    flex-direction: row;
+}
+
+.title{
+    flex-grow: 1;
+}
+
+.postcodeInputContainer{
+    flex-grow: 0;
+}
+
+#postcodeInput{
+    width: 150px;
+    height: 48px;
+    background-color: #FDE0E1;
+    color: #D01A1E;
+    font-size: 14px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+button{
+    padding: 0;
+    margin: 0;
+}
+
+#postcodeButton{
+    width: 48px;
+    height: 48px;
+    background-color: #D01A1E;
+    color: #FDE0E1;
+    font-weight: bold;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+body{
+    background-color: #FDE0E1;
+    font-family: sans-serif;
+}
+
+.stopContainer{
+    background-color: #D01A1E;
+    padding: 10px;
+    padding-bottom: 55px;
+    margin: 15px 10%;
+    border-radius: 30px;
+}
+
+.arrivalList{
+    padding: 0px;
+}
+
+.stopTitle{
+    text-align: center;
+    background-color: #D01A1E;
+    color: #FDE0E1;
+    font-size: 32px;
+    margin: 20px;
+}
+
+.arrival{
+    background-color: #C27375;
+    margin: 5px 6%;
+    padding: 10px;
+    display: flex;
+    flex-direction: row;
+    border-radius: 5px;
+    color: #5A0002;
+    font-size: 20px;
+    font-weight: bold;
+    font-family: sans-serif;
+}
+
+.lineName{
+    flex-basis: calc(25% - 25px);
+}
+
+.destinationName{
+    flex-basis: calc(75% - 75px);
+}
+
+.arrivalTime{
+    flex-basis: 100px;
+}
