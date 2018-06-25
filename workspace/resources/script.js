@@ -13,8 +13,19 @@ function getStopData() {
     xhttp.setRequestHeader("Content-type", "application/json");
     xhttp.send();
     const response = JSON.parse(xhttp.responseText);
-    console.log(response);
     const stopList = document.getElementById('stopList');
+
+    // Error handling
+    if(response.hasOwnProperty("error")){
+        stopList.innerHTML =
+            `<div class="stopContainer">
+               <div class="stopTitle">
+                 Error: ${response.error}
+               </div>
+             </div>`;
+        return;
+    }
+
     stopList.innerHTML = "";
     response.forEach(stop => {
 

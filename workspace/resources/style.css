@@ -49,13 +49,13 @@ body{
 .stopContainer{
     background-color: #D01A1E;
     padding: 10px;
-    padding-bottom: 55px;
     margin: 15px 10%;
     border-radius: 30px;
 }
 
 .arrivalList{
     padding: 0px;
+    padding-bottom: 45px;
 }
 
 .stopTitle{

@@ -36,10 +36,9 @@ export class ExpressAPI{
         app.get('/', (req,res) => res.sendFile(__dirname + '/index.html'));
 
         app.get('/closestStops', (req, res) => {
-            const postcode = req.query.postcode;
-
-            this.getNextFiveArrivalsForPostCode(postcode)
-                .then(response => res.send(JSON.stringify(response)));
+            this.getNextFiveArrivalsForPostCode(req.query.postcode)
+                .then(response => res.send(JSON.stringify(response)))
+                .catch(reason => res.send(reason.error));
         });
         app.listen(3000, () => console.log('Example app listening on port 3000!'))
     }
