@@ -1,14 +1,12 @@
 import * as express from 'express'
-import {Arrival, Stop, TfLAPI} from "./TfLAPI";
+import {Arrival, Stop, StopArrivals, TfLAPI} from "./TfLAPI";
 import {Location, PostcodesAPI} from "./PostcodesAPI";
 import {Request, Response} from "express";
 
 export class ExpressAPI{
     private tflAPI: TfLAPI = new TfLAPI();
     private postcodesAPI: PostcodesAPI = new PostcodesAPI();
-    private static takeFirstFiveForEach = stopArrivals => stopArrivals.map(arrivals => arrivals.slice(0, 5));
     private static RADIUS_INCREASE_STEP : number = 100;
-
     public hostWebsite() {
         const app = express();
 
@@ -39,17 +37,25 @@ export class ExpressAPI{
             .then(message => res.send(message));
     }
 
-    private getNextFiveArrivalsForPostCode(postcode: string) : Promise<Arrival[][]> {
+    private getNextFiveArrivalsForPostCode(postcode: string) : Promise<StopArrivals[]> {
         return this.postcodesAPI.getLongLatFromPostcode(postcode)
             .then(location => this.getClosestTwoStops(location))
             .then(list => Promise.all(
-                list.map(stop => this.tflAPI.getNextArrivalsAtStop(stop.naptanId))
+                list.map(stop => this.tflAPI.getNextArrivalsAtStop(stop))
             ))
-            .then(ExpressAPI.takeFirstFiveForEach);
+            .then(ExpressAPI.takeFirstFiveArrivalsForEachStop);
+    }
+
+    //limit number of arrivals to 5 for each stop in the list
+    private static takeFirstFiveArrivalsForEachStop(stopArrivalList : StopArrivals[]): StopArrivals[] {
+        return stopArrivalList.map(stopArrivals => {
+            stopArrivals.arrivals = stopArrivals.arrivals.slice(0, 5);
+            return stopArrivals;
+        });
     }
 
     private getClosestTwoStops(location: Location, radius: number = 200) : Promise<Stop[]> {
-        return this.tflAPI.getNearestStopIDsToLocation(location, radius)
+        return this.tflAPI.getNearestStopsToLocation(location, radius)
             //increase radius until at least 2 stops found
             .then(stopList => {
                 if (stopList.length < 2) {
@@ -67,7 +73,7 @@ export class ExpressAPI{
         });
     }
 
-    private getBusTimes = (postcode: string): Promise<Arrival[][]> => {
+    private getBusTimes = (postcode: string): Promise<StopArrivals[]> => {
         return this.postcodesAPI.isValidLondonPostcode(postcode)
             .then(valid => {
                 if (!valid) {

@@ -9,9 +9,15 @@ export interface Arrival{
     destinationName: string
 }
 
+export interface StopArrivals {
+    stopName: string,
+    arrivals: Arrival[]
+}
+
 export interface Stop {
-    distance : number
-    naptanId : string
+    distance : number,
+    naptanId : string,
+    commonName : string
 }
 
 export class TfLAPI {
@@ -25,20 +31,24 @@ export class TfLAPI {
     private static API_URL = "https://api.tfl.gov.uk";
     private static BUS_STOP_TYPE = "NaptanPublicBusCoachTram";
 
-    public getNextArrivalsAtStop(stopID: string): Promise<Arrival[]> {
+    public getNextArrivalsAtStop(stop: Stop): Promise<StopArrivals> {
         const nextArrivalsRequest = {
-            url: `${TfLAPI.API_URL}/StopPoint/${stopID}/Arrivals`,
+            url: `${TfLAPI.API_URL}/StopPoint/${stop.naptanId}/Arrivals`,
             qs: TfLAPI.credentials
         };
 
         return request.get(nextArrivalsRequest)
             .then(JSON.parse)
             .then(this.parseArrivals)
-            .then((list) => list.sort((a,b) => a.expectedArrival.diff(b.expectedArrival)));
+            .then((list) => list.sort((a,b) => a.expectedArrival.diff(b.expectedArrival)))
+            .then(list => {return {
+                stopName: stop.commonName,
+                arrivals: list
+            }});
     }
 
 
-    public getNearestStopIDsToLocation = (location: Location, radius: number = 200): Promise<Stop[]> =>  {
+    public getNearestStopsToLocation = (location: Location, radius: number = 200): Promise<Stop[]> =>  {
         const nearestStopPointRequest = {
             url:`${TfLAPI.API_URL}/StopPoint`,
             qs: {

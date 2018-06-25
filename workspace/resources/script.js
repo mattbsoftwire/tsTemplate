@@ -36,7 +36,16 @@ function getStopData() {
 
         let arrivalList = '';
 
-        stop.forEach(arrival => {
+        if (stop.arrivals.length == 0) {
+            arrivalList =
+                `<div class="arrival">
+                  <div class="lineName"></div>
+                  <div class="destinationName">No arrivals&hellip;</div>
+                  <div class="arrivalTime"></div>
+                </div>`;
+        }
+
+        stop.arrivals.forEach(arrival => {
             const arrivalTime = new Date(arrival.expectedArrival).toLocaleTimeString();
 
             arrivalList +=
@@ -50,7 +59,7 @@ function getStopData() {
         const stopHTML = 
             `<div class="stopContainer">
                <div class="stopTitle">
-                 ${stop[0].stationName}
+                 ${stop.stopName}
                </div>
                <div class="arrivalList">
                  ${arrivalList}
