@@ -35,29 +35,39 @@ export class ExpressAPI{
         });
     }
 
-    public hostAPI() {
+    public hostWebsite() {
         const app = express();
 
         app.use(express.static(__dirname + '/resources'));
         app.get('/', (req,res) => res.sendFile(__dirname + '/index.html'));
 
-        app.get('/closestStops', (req, res) => {
-            if (!req.hasOwnProperty("query")) {
-                res.send(this.createErrorMessage("invalid request"));
-            }
-
-            const postcode = req.query.postcode;
-
-            this.postcodesAPI.isValidLondonPostcode(postcode)
-                .then(valid => {
-                    if (!valid) {
-                        throw new Error("Postcode not in London");
-                    }
-                })
-                .then(() => this.getNextFiveArrivalsForPostCode(postcode))
-                .then(response => res.send(JSON.stringify(response)))
-                .catch(error => res.send(this.createErrorMessage(error.message)));
-        });
+        app.get('/closestStops', this.sendBusTimeResponse);
         app.listen(3000, () => console.log('Example app listening on port 3000!'))
     }
+
+    private sendBusTimeResponse = (req, res) => {
+        // Sanitise the request
+        if (!req.hasOwnProperty("query")) {
+            res.send(this.createErrorMessage("Invalid request"));
+        }
+
+        const postcode = req.query.postcode;
+
+        this.getBusTimes(postcode)
+            .then(JSON.stringify)
+            .catch(error => this.createErrorMessage(error.message))
+            .then(message => res.send(message));
+    }
+
+    private getBusTimes = (postcode: string): Promise<Arrival[][]> => {
+        return this.postcodesAPI.isValidLondonPostcode(postcode)
+            .then(valid => {
+                if (!valid) {
+                    throw new Error("Postcode not in London");
+                }
+            })
+            .then(() => this.getNextFiveArrivalsForPostCode(postcode))
+    }
+
+
 }
