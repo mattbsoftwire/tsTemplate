@@ -9,6 +9,11 @@ export class PostcodesAPI {
     private static API_URL = "http://api.postcodes.io";
 
     public isValidPostcode(postcode: string): Promise<boolean> {
+        //API doesn't handle empty string
+        if(postcode === '') {
+            return Promise.resolve(false);
+        }
+
         return request(`${PostcodesAPI.API_URL}/postcodes/${postcode}/validate`)
             .then(JSON.parse)
             .then(response => response.result);

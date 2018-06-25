@@ -19,6 +19,7 @@ export class ExpressAPI{
 
     private getClosestTwoStops(location: Location, radius: number = 200) : Promise<Stop[]> {
         return this.tflAPI.getNearestStopIDsToLocation(location, radius)
+            //increase radius until at least 2 stops found
             .then(stopList => {
                 if (stopList.length < 2) {
                     return this.getClosestTwoStops(location, radius + ExpressAPI.RADIUS_INCREASE_STEP);
@@ -39,9 +40,10 @@ export class ExpressAPI{
         const app = express();
 
         app.use(express.static(__dirname + '/resources'));
-        app.get('/', (req,res) => res.sendFile(__dirname + '/index.html'));
 
+        app.get('/', (req,res) => res.sendFile(__dirname + '/index.html'));
         app.get('/closestStops', this.sendBusTimeResponse);
+
         app.listen(3000, () => console.log('Example app listening on port 3000!'))
     }
 
@@ -68,6 +70,8 @@ export class ExpressAPI{
             })
             .then(() => this.getNextFiveArrivalsForPostCode(postcode))
     }
+
+
 
 
 }

@@ -26,35 +26,47 @@ export class TfLAPI {
     private static BUS_STOP_TYPE = "NaptanPublicBusCoachTram";
 
     public getNextArrivalsAtStop(stopID: string): Promise<Arrival[]> {
-        return request.get({
+        const nextArrivalsRequest = {
             url: `${TfLAPI.API_URL}/StopPoint/${stopID}/Arrivals`,
             qs: TfLAPI.credentials
-        })
+        };
+
+        return request.get(nextArrivalsRequest)
             .then(JSON.parse)
-            .then(list => list.map(arrival => {
-                arrival.expectedArrival = moment(arrival.expectedArrival);
-                return arrival as Arrival;
-            }))
+            .then(this.parseArrivals)
             .then((list) => list.sort((a,b) => a.expectedArrival.diff(b.expectedArrival)));
     }
 
+
     public getNearestStopIDsToLocation = (location: Location, radius: number = 200): Promise<Stop[]> =>  {
-        return request.get({
-                        url:`${TfLAPI.API_URL}/StopPoint`,
-                        qs: {
-                            stopTypes: TfLAPI.BUS_STOP_TYPE,
-                            lat: location.latitude,
-                            lon: location.longitude,
-                            radius: radius,
-                            ...TfLAPI.credentials
-                        },
-                        json: true
-                    })
-            .then((result): Stop[] => result.stopPoints
-                .map((stop): Stop => {
-                    stop.distance = Number(stop.distance);
-                    return stop;
-                })
-            );
+        const nearestStopPointRequest = {
+            url:`${TfLAPI.API_URL}/StopPoint`,
+            qs: {
+                stopTypes: TfLAPI.BUS_STOP_TYPE,
+                lat: location.latitude,
+                lon: location.longitude,
+                radius: radius,
+                ...TfLAPI.credentials
+            },
+            json: true
+        };
+
+        return request.get(nearestStopPointRequest)
+            .then(this.parseStops);
+    };
+
+    private parseStops = (stops): Stop[] => {
+        return stops.stopPoints
+            .map((stop): Stop => {
+                stop.distance = Number(stop.distance);
+                return stop;
+            })
+    };
+
+    private parseArrivals = (arrivals): Arrival[] => {
+        return arrivals.map((arrival): Arrival => {
+            arrival.expectedArrival = moment(arrival.expectedArrival);
+            return arrival;
+        })
     }
 }
